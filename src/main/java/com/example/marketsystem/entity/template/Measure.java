@@ -1,5 +1,5 @@
 package com.example.marketsystem.entity.template;
 
 public enum Measure {
-    KG, PIECE, KUB, L
+    KG, DONA, L, YASHIK, METR, KAROBKA, KUB, RULON
 }
