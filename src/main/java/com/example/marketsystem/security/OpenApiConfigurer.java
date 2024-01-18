@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-        info = @Info(title = " LOGISTIC PROJECT", version = "v2",
+        info = @Info(title = " MARKET-SYSTEM PROJECT", version = "v2",
                 description = "This API just for learning Spring boot features",
                 contact = @Contact(name = "It city academy", url = "http://itcityacademy.uz", email = "hucodeuz96@gmail.com"),
                 license = @License(name = "Apache Foundation", url = "https://apache.org/")
