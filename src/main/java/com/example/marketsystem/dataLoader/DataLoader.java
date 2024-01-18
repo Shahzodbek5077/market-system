@@ -28,6 +28,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args){
         if (initMode.equals("create-drop") || initMode.equals("create")) {
+            roleRepository.save(Role.builder().roleName(RoleName.ROLE_USER).build());
             roleRepository.save(Role.builder().roleName(RoleName.ROLE_SELLER).build());
             roleRepository.save(Role.builder().roleName(RoleName.ROLE_ADMIN).build());
             companyRepository.save(new Company("Market"));
