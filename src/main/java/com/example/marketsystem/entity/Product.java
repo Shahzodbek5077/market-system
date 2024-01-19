@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -18,6 +20,10 @@ public class Product extends AbsEntity {
 
     private String  name;
 
+    @NotNull(message = "Measure count bush bulmasin")
+    private Double measureCount;
+
+    @NotNull(message = "Price bush bulmasin")
     private Double measureCount;
 
     private Double price;

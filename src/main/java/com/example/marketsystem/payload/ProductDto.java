@@ -12,6 +12,11 @@ import lombok.*;
 public class ProductDto {
     @Schema(hidden = true)
     private Long id;
+    private String name;
+    private Double measureCount;
+    private Double price;
+    private Double percentage;
+    private Long categoryId;
     @NotBlank(message = "Name bo'sh bo'lmasin")
     private String name;
     @NotBlank(message = "Product soni bo'sh bo'lmasin")

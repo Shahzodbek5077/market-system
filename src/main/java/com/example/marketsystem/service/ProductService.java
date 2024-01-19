@@ -22,6 +22,9 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+  
+
+
 
     public ApiResponse<?> saveOrEdit(Long id, ProductDto productDto){
         Product product = id != null ? productRepository.findById(id).orElseThrow(() ->
@@ -41,11 +44,22 @@ public class ProductService {
     public Measure measure(String measure){
         for (Measure value : Measure.values()) {
             if(value.name().equalsIgnoreCase(measure)) return value;
-        }
         return null;
     }
 
+      
+    public ProductDto getOne(Long id){
+        Product product = productRepository.findById(id).orElseThrow(() -> GenericNotFoundException.builder().message("Not found").statusCode(404).build());
+        return productDtoObj(product);
+    }
 
+    public ApiResponse<?> delete(Long id){
+        Product product = productRepository.findById(id).orElseThrow(() -> GenericNotFoundException.builder().message("Not found").statusCode(404).build());
+        productRepository.delete(product);
+        return new ApiResponse<>("Successfully deleted product", true);
+    }
+
+      
     public ApiResponse<?> getPage(int page,int size) throws Exception {
         Page<Product> pages = productRepository.findAll(CommonUtils.getPageable(page, size));
         if(!pages.isEmpty()){
