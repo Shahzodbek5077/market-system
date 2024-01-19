@@ -24,8 +24,6 @@ public class Product extends AbsEntity {
     private Double measureCount;
 
     @NotNull(message = "Price bush bulmasin")
-    private Double measureCount;
-
     private Double price;
 
     private Double percentage;

@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,11 +21,9 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-  
 
 
-
-    public ApiResponse<?> saveOrEdit(Long id, ProductDto productDto){
+    public ApiResponse<?> saveOrEdit(Long id, ProductDto productDto) {
         Product product = id != null ? productRepository.findById(id).orElseThrow(() ->
                 GenericNotFoundException.builder().message("success").statusCode(204).build()) : new Product();
         product.setName(productDto.getName());
@@ -41,36 +38,38 @@ public class ProductService {
     }
 
 
-    public Measure measure(String measure){
+    public Measure measure(String measure) {
         for (Measure value : Measure.values()) {
-            if(value.name().equalsIgnoreCase(measure)) return value;
+            if (value.name().equalsIgnoreCase(measure)) return value;
+        }
         return null;
     }
 
-      
-    public ProductDto getOne(Long id){
+
+    public ProductDto getOne(Long id) {
         Product product = productRepository.findById(id).orElseThrow(() -> GenericNotFoundException.builder().message("Not found").statusCode(404).build());
-        return productDtoObj(product);
+        return getProductDto(product);
     }
 
-    public ApiResponse<?> delete(Long id){
+
+    public ApiResponse<?> delete(Long id) {
         Product product = productRepository.findById(id).orElseThrow(() -> GenericNotFoundException.builder().message("Not found").statusCode(404).build());
         productRepository.delete(product);
         return new ApiResponse<>("Successfully deleted product", true);
     }
 
-      
-    public ApiResponse<?> getPage(int page,int size) throws Exception {
-        Page<Product> pages = productRepository.findAll(CommonUtils.getPageable(page, size));
-        if(!pages.isEmpty()){
+
+    public ApiResponse<?> getPage(int page, int size) throws Exception {
+        Page<Product> pages = productRepository.findAllBy(CommonUtils.getPageable(page, size));
+        if (!pages.isEmpty()) {
             return ApiResponse.builder().body(ResPageable.builder().page(page).size(size).totalPage(pages.getTotalPages())
                     .totalElements(pages.getTotalElements())
-                    .object(new ArrayList<>(pages.stream().map(this::getProductDto).toList())).build()).build();
-        }
-        else return ApiResponse.builder().message("Product list empty").success(false).build();
+                    .object(new ArrayList<>(pages.stream().map(this::getProductDto).toList())).build()).message("Success").build();
+        } else return ApiResponse.builder().message("Product list empty").success(false).build();
     }
 
-    public ProductDto getProductDto(Product product){
+
+    public ProductDto getProductDto(Product product) {
         return ProductDto.builder()
                 .id(product.getId())
                 .name(product.getName())
@@ -78,7 +77,7 @@ public class ProductService {
                 .price(product.getPrice())
                 .percentage(product.getPercentage())
                 .categoryId(product.getCategory() != null ? product.getCategory().getId() : 0)
-                .categoryName(product.getName())
+                .categoryName(product.getCategory().getName())
                 .measure(product.getMeasure() != null ? product.getMeasure().name() : "").build();
     }
 

@@ -2,6 +2,7 @@ package com.example.marketsystem.payload;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -12,16 +13,11 @@ import lombok.*;
 public class ProductDto {
     @Schema(hidden = true)
     private Long id;
-    private String name;
-    private Double measureCount;
-    private Double price;
-    private Double percentage;
-    private Long categoryId;
     @NotBlank(message = "Name bo'sh bo'lmasin")
     private String name;
-    @NotBlank(message = "Product soni bo'sh bo'lmasin")
+    @NotNull(message = "Product soni bo'sh bo'lmasin")
     private Double measureCount;
-    @NotBlank(message = "Product narxini kiriting")
+    @NotNull(message = "product narxi bush bulmasin")
     private Double price;
     private Double percentage;
     @NotBlank(message = "Category bo'sh bo'lmasin")
