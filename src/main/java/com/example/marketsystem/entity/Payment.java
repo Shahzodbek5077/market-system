@@ -28,5 +28,6 @@ public class Payment extends AbsEntity {
 
     @ManyToOne
     private Company company;
+    private Double summa;
 
 }
