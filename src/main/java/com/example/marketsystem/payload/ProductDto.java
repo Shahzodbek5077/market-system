@@ -20,6 +20,7 @@ public class ProductDto {
     @NotNull(message = "product narxi bush bulmasin")
     private Double price;
     private Double percentage;
+    private Double salePrice;
     @NotBlank(message = "Category bo'sh bo'lmasin")
     private Long categoryId;
     @Schema(hidden = true)

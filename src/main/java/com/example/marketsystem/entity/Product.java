@@ -26,7 +26,9 @@ public class Product extends AbsEntity {
     @NotNull(message = "Price bush bulmasin")
     private Double price;
 
-    private Double percentage;
+    private Double percentage;//necha foiz minishi
+
+    private Double salePrice;//sotuv narxi
 
     @ManyToOne
     private Category category;
