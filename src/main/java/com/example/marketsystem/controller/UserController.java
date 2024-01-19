@@ -1,5 +1,6 @@
 package com.example.marketsystem.controller;
 
+import com.example.marketsystem.entity.AuthLoginDto;
 import com.example.marketsystem.payload.ApiResponse;
 import com.example.marketsystem.payload.UserDto;
 import com.example.marketsystem.service.UserService;
@@ -19,6 +20,10 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
+    @PostMapping( "/login")
+    public HttpEntity<?> login(@Valid @RequestBody AuthLoginDto loginDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.forLogin(loginDTO));
+    }
 
     @GetMapping("/{userId}")
     public ResponseEntity<?> get(@PathVariable Long userId) {

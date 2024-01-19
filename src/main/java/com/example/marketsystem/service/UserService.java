@@ -1,9 +1,6 @@
 package com.example.marketsystem.service;
 
-import com.example.marketsystem.entity.Order;
-import com.example.marketsystem.entity.Pay;
-import com.example.marketsystem.entity.Payment;
-import com.example.marketsystem.entity.User;
+import com.example.marketsystem.entity.*;
 import com.example.marketsystem.entity.template.RoleName;
 import com.example.marketsystem.exception.GenericNotFoundException;
 import com.example.marketsystem.payload.ApiResponse;
@@ -11,9 +8,11 @@ import com.example.marketsystem.payload.UserDto;
 import com.example.marketsystem.repository.PaymentRepository;
 import com.example.marketsystem.repository.RoleRepository;
 import com.example.marketsystem.repository.UserRepository;
+import com.example.marketsystem.security.JwtProvider;
 import com.example.marketsystem.utils.CommonUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,9 +20,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PaymentRepository paymentRepository;
+    private final JwtProvider jwtProvider;
 
     public ApiResponse<?> addUser(UserDto userDto, String role) {
         userRepository.save(User.builder()
@@ -95,5 +96,15 @@ public class UserService {
         user.setEnabled(false);
         userRepository.save(user);
         return new ApiResponse<>("Success",true);
+    }
+
+    public ApiResponse<?> forLogin(AuthLoginDto loginDTO) {
+        User authUser = userRepository.findByPhoneNumberEquals(loginDTO.getPhoneNumber()).orElseThrow(() ->
+                GenericNotFoundException.builder().message("User not found").statusCode(404).build());
+        if (passwordEncoder.matches(loginDTO.getPassword(), authUser.getPassword())) {
+            String token = jwtProvider.generateToken(loginDTO.getPhoneNumber());
+            return new ApiResponse<>(token, authUser.getRole().getRoleName().name(), true);
+        }
+        return new ApiResponse<>("Password not match", false);
     }
 }
