@@ -1,10 +1,14 @@
 package com.example.marketsystem.service;
 
+import com.example.marketsystem.entity.Order;
+import com.example.marketsystem.entity.Pay;
+import com.example.marketsystem.entity.Payment;
 import com.example.marketsystem.entity.User;
 import com.example.marketsystem.entity.template.RoleName;
 import com.example.marketsystem.exception.GenericNotFoundException;
 import com.example.marketsystem.payload.ApiResponse;
 import com.example.marketsystem.payload.UserDto;
+import com.example.marketsystem.repository.PaymentRepository;
 import com.example.marketsystem.repository.RoleRepository;
 import com.example.marketsystem.repository.UserRepository;
 import com.example.marketsystem.utils.CommonUtils;
@@ -19,6 +23,7 @@ import java.util.List;
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PaymentRepository paymentRepository;
 
     public ApiResponse<?> addUser(UserDto userDto, String role) {
         userRepository.save(User.builder()
@@ -37,12 +42,24 @@ public class UserService {
                 .success(true).message("Success").build();
     }
     public UserDto getUserDto(User user){
+        double totalAmount = 0;
+        double amountPaid = 0;
+        List<Payment> userPayment = paymentRepository.getUserPayment(user);
+        for (Payment payment : userPayment) {
+            totalAmount += payment.getSumma();
+            for (Pay pay : payment.getPays()) {
+                amountPaid += pay.getPrice();
+            }
+        }
         return UserDto.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .address(user.getAddress())
                 .password(user.getPassword())
                 .phoneNumber(user.getPhoneNumber())
+                .debt(user.getDebit())
+                .totalAmount(totalAmount)
+                .amountPaid(amountPaid)
                 .build();
     }
 

@@ -14,5 +14,7 @@ public class UserDto {
     private String phoneNumber;
     private String address;
     private String password;
-
+    private Double totalAmount;//umumiy summa
+    private Double amountPaid; //tulangan summa
+    private Double debt;//qarzi
 }

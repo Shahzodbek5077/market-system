@@ -27,10 +27,16 @@ public class ProductService {
     public ApiResponse<?> saveOrEdit(Long id, ProductDto productDto) {
         Product product = id != null ? productRepository.findById(id).orElseThrow(() ->
                 GenericNotFoundException.builder().message("success").statusCode(204).build()) : new Product();
+        if (productDto.getPercentage() != 0){
+            double salePrice = productDto.getPrice() / 100 * productDto.getPercentage() + productDto.getPrice();
+            product.setSalePrice(salePrice);
+            product.setPercentage(productDto.getPercentage());
+        }else if (productDto.getSalePrice() != 0){
+            product.setSalePrice(productDto.getSalePrice());
+        }
         product.setName(productDto.getName());
         product.setMeasureCount(productDto.getMeasureCount());
         product.setPrice(productDto.getPrice());
-        product.setPercentage(productDto.getPercentage());
         product.setCategory(categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() ->
                 GenericNotFoundException.builder().message("Category not found ").statusCode(204).build()));
         product.setMeasure(measure(productDto.getMeasure()));
@@ -77,6 +83,7 @@ public class ProductService {
                 .measureCount(product.getMeasureCount())
                 .price(product.getPrice())
                 .percentage(product.getPercentage())
+                .salePrice(product.getSalePrice())
                 .categoryId(product.getCategory() != null ? product.getCategory().getId() : 0)
                 .categoryName(product.getCategory().getName())
                 .measure(product.getMeasure() != null ? product.getMeasure().name() : "").build();

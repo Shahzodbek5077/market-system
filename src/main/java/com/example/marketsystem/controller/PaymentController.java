@@ -19,9 +19,9 @@ public class PaymentController {
     private final PaymentService paymentService;
 
 
-    @PostMapping
-    public HttpEntity<?> save(@RequestBody PaymentDto paymentDto){
-        ApiResponse<?> apiResponse = paymentService.save(paymentDto);
-        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
-    }
+//    @PostMapping
+//    public HttpEntity<?> save(@RequestBody PaymentDto paymentDto){
+//        ApiResponse<?> apiResponse = paymentService.save(paymentDto);
+//        return ResponseEntity.status(HttpStatus.OK).body(apiResponse);
+//    }
 }
