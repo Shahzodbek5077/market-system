@@ -11,6 +11,7 @@ import com.example.marketsystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component

@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -21,54 +22,32 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+  
+
+
 
     public ApiResponse<?> saveOrEdit(Long id, ProductDto productDto){
-        Product product;
-        if (id==0){
-            product = Product.builder()
-                    .name(productDto.getName())
-                    .measureCount(productDto.getMeasureCount())
-                    .price(productDto.getPrice())
-                    .percentage(productDto.getPercentage())
-                    .category(categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() -> GenericNotFoundException.builder().message("Not found").statusCode(404).build()))
-                    .measure(measure(productDto.getMeasure())).build();
-        }else {
-            product = productRepository.findById(id).orElseThrow(() -> GenericNotFoundException.builder().message("Not found").statusCode(404).build());
-            product.setName(productDto.getName());
-            product.setMeasureCount(productDto.getMeasureCount());
-            product.setPrice(productDto.getPrice());
-            product.setPercentage(productDto.getPercentage());
-            product.setCategory(categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() -> GenericNotFoundException.builder().message("Not found").statusCode(404).build()));
-            product.setMeasure(measure(productDto.getMeasure()));
-        }
+        Product product = id != null ? productRepository.findById(id).orElseThrow(() ->
+                GenericNotFoundException.builder().message("success").statusCode(204).build()) : new Product();
+        product.setName(productDto.getName());
+        product.setMeasureCount(productDto.getMeasureCount());
+        product.setPrice(productDto.getPrice());
+        product.setPercentage(productDto.getPercentage());
+        product.setCategory(categoryRepository.findById(productDto.getCategoryId()).orElseThrow(() ->
+                GenericNotFoundException.builder().message("Category not found ").statusCode(204).build()));
+        product.setMeasure(measure(productDto.getMeasure()));
         productRepository.save(product);
-        return new ApiResponse<>("Successfully completed product", true);
+        return ApiResponse.builder().message("success").build();
     }
 
-    public ProductDto productDtoObj(Product product){
-        return new ProductDto(product.getId(), product.getName(), product.getMeasureCount(), product.getPrice(), product.getPercentage(), product.getCategory().getId(), product.getMeasure().name());
-    }
 
-    public ApiResponse<?> getPage(int page, int size) throws Exception {
-        Page<Product> allBy = productRepository.findAllBy(CommonUtils.getPageable(page, size));
-        if (!allBy.isEmpty()){
-            return ApiResponse.builder()
-                    .success(true)
-                    .body(ResPageable.builder().page(page).size(size).totalElements(allBy.getTotalElements()).totalPage(allBy.getTotalPages()
-                    ).object(new ArrayList<>(allBy.stream().map(this::productDtoObj).toList())).build()).message("Success").build();
-        }
-        return new ApiResponse<>("Product list empty", false);
-    }
-
-    public Measure measure(String name){
+    public Measure measure(String measure){
         for (Measure value : Measure.values()) {
-            if (value.name().equalsIgnoreCase(name)){
-                return value;
-            }
-        }
+            if(value.name().equalsIgnoreCase(measure)) return value;
         return null;
     }
 
+      
     public ProductDto getOne(Long id){
         Product product = productRepository.findById(id).orElseThrow(() -> GenericNotFoundException.builder().message("Not found").statusCode(404).build());
         return productDtoObj(product);
@@ -79,4 +58,28 @@ public class ProductService {
         productRepository.delete(product);
         return new ApiResponse<>("Successfully deleted product", true);
     }
+
+      
+    public ApiResponse<?> getPage(int page,int size) throws Exception {
+        Page<Product> pages = productRepository.findAll(CommonUtils.getPageable(page, size));
+        if(!pages.isEmpty()){
+            return ApiResponse.builder().body(ResPageable.builder().page(page).size(size).totalPage(pages.getTotalPages())
+                    .totalElements(pages.getTotalElements())
+                    .object(new ArrayList<>(pages.stream().map(this::getProductDto).toList())).build()).build();
+        }
+        else return ApiResponse.builder().message("Product list empty").success(false).build();
+    }
+
+    public ProductDto getProductDto(Product product){
+        return ProductDto.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .measureCount(product.getMeasureCount())
+                .price(product.getPrice())
+                .percentage(product.getPercentage())
+                .categoryId(product.getCategory() != null ? product.getCategory().getId() : 0)
+                .categoryName(product.getName())
+                .measure(product.getMeasure() != null ? product.getMeasure().name() : "").build();
+    }
+
 }

@@ -18,13 +18,14 @@ import lombok.*;
 @Builder
 public class Product extends AbsEntity {
 
-    @NotBlank(message = "Name bo'sh bo'lmasin")
     private String  name;
 
     @NotNull(message = "Measure count bush bulmasin")
     private Double measureCount;
 
     @NotNull(message = "Price bush bulmasin")
+    private Double measureCount;
+
     private Double price;
 
     private Double percentage;
