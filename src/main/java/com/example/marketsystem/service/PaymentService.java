@@ -6,10 +6,17 @@ import com.example.marketsystem.entity.template.RoleName;
 import com.example.marketsystem.exception.GenericNotFoundException;
 import com.example.marketsystem.payload.ApiResponse;
 import com.example.marketsystem.payload.PaymentDto;
+import com.example.marketsystem.payload.ResPageable;
 import com.example.marketsystem.repository.*;
+import com.example.marketsystem.utils.CommonUtils;
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfWriter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +28,7 @@ public class PaymentService {
     private final CompanyRepository companyRepository;
     private final PayRepository payRepository;
     private final ProductRepository productRepository;
+    private final PaymentRepository paymentRepository;
 
     public ApiResponse<?> save(PaymentDto paymentDto) {
         User user = userRepository.findById(paymentDto.getId()).orElseThrow(() -> GenericNotFoundException.builder().message("User not found").statusCode(404).build());
@@ -65,5 +73,39 @@ public class PaymentService {
         return ApiResponse.builder().message("success").build();
     }
 
+    public ApiResponse<?> getPagePayments(int page, int size) throws Exception {
+        Page<Payment> payments = paymentRepository.findAll(CommonUtils.getPageable(page, size));
+        if (!payments.isEmpty()) {
+            return ApiResponse.builder().body(ResPageable.builder().page(page).size(size).totalPage(payments.getTotalPages())
+                    .totalElements(payments.getTotalElements())
+                    .object(new ArrayList<>(payments.stream().map(this::getPaymentDto).toList())).build()).message("Success").build();
+        } else return ApiResponse.builder().message("Product list empty").success(false).build();
+    }
 
+    public PaymentDto getPaymentDto(Payment payment){
+        return PaymentDto.builder()
+                .id(payment.getId())
+                .user(payment.getUser())
+                .orders(payment.getOrders())
+                .pays(payment.getPays())
+                .company(payment.getCompany())
+                .build();
+    }
+
+
+
+    public void export(HttpServletResponse response) throws IOException {
+        Document document = new Document(PageSize.A4);
+        PdfWriter.getInstance(document, response.getOutputStream());
+
+        document.open();
+        Font fontParagraph = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+        fontParagraph.setSize(18);
+
+        Paragraph paragraph = new Paragraph("xozirgi vaqt", fontParagraph);
+        paragraph.setAlignment(Paragraph.ALIGN_CENTER);
+
+        document.add(paragraph);
+        document.close();
+    }
 }
